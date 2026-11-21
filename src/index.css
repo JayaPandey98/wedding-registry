@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root { min-height: 100%; }
+  body { @apply bg-[#EFE9DD] font-sans text-ink antialiased; -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 2px solid #C85A32; outline-offset: 2px; }
+}
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition active:scale-[.97] disabled:pointer-events-none disabled:opacity-50; }
+  .btn-primary { @apply bg-terra text-white hover:bg-terra-dark; }
+  .btn-soft { @apply bg-terra-soft text-terra-dark hover:bg-[#F3D5C7]; }
+  .btn-sage { @apply bg-sage text-white hover:bg-[#3D5A4D]; }
+  .btn-ghost { @apply border border-line bg-white text-ink hover:bg-cream; }
+  .field { @apply w-full rounded-2xl border border-line bg-cream px-4 py-3 text-[15px] outline-none focus:border-terra disabled:opacity-50; }
+  .chip { @apply rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold transition; }
+  .chip-on { @apply border-sage bg-sage-soft text-sage; }
+  .card { @apply rounded-3xl border border-line bg-white; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
