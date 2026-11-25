@@ -1,6 +1,6 @@
 export const ANON = 'Anonymous Well-Wisher'
 export const CATEGORIES = ['Travel', 'Hobby', 'Home', 'Experience']
-export const UPI_RE = /^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$/
+export const UPI_RE = /^[a-zA-Z0-9._-]{2,255}@[a-zA-Z]{2,64}$/
 
 export const fmtINR = (n) => '₹' + Math.round(Number(n) || 0).toLocaleString('en-IN')
 export const pct = (raised, target) => (target > 0 ? Math.min(100, Math.round((raised / target) * 100)) : 0)

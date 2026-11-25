@@ -13,7 +13,7 @@ export default function App() {
     <ErrorBoundary>
       <AuthProvider>
         <ToastProvider>
-          <div className="mx-auto min-h-screen w-full max-w-md bg-cream md:my-5 md:min-h-[calc(100vh-2.5rem)] md:rounded-[2.5rem] md:border md:border-line md:shadow-2xl">
+          <div className="min-h-screen w-full bg-cream">
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/dashboard" element={<Dashboard />} />

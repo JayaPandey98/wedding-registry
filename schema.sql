@@ -12,7 +12,7 @@ create table if not exists public.registries (
   couple_names text not null check (char_length(couple_names) between 1 and 100),
   wedding_date date,
   welcome_note text not null default '' check (char_length(welcome_note) <= 500),
-  upi_id       text not null check (upi_id ~ '^[a-zA-Z0-9._-]{2,256}@[a-zA-Z]{2,64}$'),
+  upi_id       text not null check (upi_id ~ '^[a-zA-Z0-9._-]{2,255}@[a-zA-Z]{2,64}$'),
   created_at   timestamptz not null default now()
 );
 

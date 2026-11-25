@@ -4,7 +4,13 @@
 
 @layer base {
   html, body, #root { min-height: 100%; }
-  body { @apply bg-[#EFE9DD] font-sans text-ink antialiased; -webkit-tap-highlight-color: transparent; }
+  body {
+    @apply bg-cream font-sans text-ink antialiased;
+    -webkit-tap-highlight-color: transparent;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% -10%, rgba(200, 90, 50, 0.08), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(74, 107, 93, 0.07), transparent 50%);
+  }
   :focus-visible { outline: 2px solid #C85A32; outline-offset: 2px; }
 }
 @layer components {

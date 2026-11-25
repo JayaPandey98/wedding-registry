@@ -30,7 +30,37 @@ function SignIn() {
   const [state, setState] = useState({ busy: false, sent: false, err: '' })
   const redirectTo = window.location.origin + '/'
 
-  const google = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
+  async function google() {
+    setState({ busy: true, sent: false, err: '' })
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo, skipBrowserRedirect: true },
+    })
+    if (error || !data?.url) {
+      setState({ busy: false, sent: false, err: error?.message || 'Could not start Google sign-in.' })
+      return
+    }
+    // Catch misconfigured providers before navigating (otherwise the tab looks stuck).
+    try {
+      const res = await fetch(data.url, { method: 'GET', redirect: 'manual' })
+      if (res.status >= 400) {
+        const body = await res.json().catch(() => ({}))
+        const msg = body.msg || body.error_description || body.message || ''
+        setState({
+          busy: false,
+          sent: false,
+          err: /not enabled|unsupported provider/i.test(msg)
+            ? 'Google sign-in is not enabled in your Supabase project yet. Use the email magic link below, or enable Google under Authentication → Providers.'
+            : (msg || 'Google sign-in failed. Check Supabase Auth settings.'),
+        })
+        return
+      }
+    } catch {
+      // Network/CORS quirks — fall through and let the browser redirect.
+    }
+    window.location.assign(data.url)
+  }
+
   async function magic(e) {
     e.preventDefault()
     setState({ busy: true, sent: false, err: '' })
@@ -40,7 +70,7 @@ function SignIn() {
 
   return (
     <div className="space-y-3">
-      <button onClick={google} disabled={!hasSupabase} className="btn btn-ghost w-full !py-3.5">
+      <button onClick={google} disabled={!hasSupabase || state.busy} className="btn btn-ghost w-full !py-3.5">
         <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.7 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.9-4.7l-7.8-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
         Sign in with Google
       </button>
@@ -137,17 +167,32 @@ function Account() {
 
 export default function Landing() {
   return (
-    <div className="space-y-8 p-6 pb-12 pt-10">
-      <div className="space-y-4">
-        <h1 className="font-display text-[2.6rem] leading-[1.05]">Skip the dinner sets. Crowdfund memories that last.</h1>
-        <p className="text-[17px] text-muted">List the honeymoon, the guitar, the espresso machine. Guests chip in any amount over UPI and leave a wish with it.</p>
+    <div className="mx-auto grid min-h-screen w-full max-w-6xl gap-10 px-5 py-10 pb-16 sm:px-8 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-10 lg:py-0">
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <p className="font-display text-2xl text-terra sm:text-3xl">Wedding Gift Registry</p>
+          <h1 className="font-display text-[2.4rem] leading-[1.05] sm:text-[3.1rem] lg:text-[3.4rem]">
+            Skip the dinner sets. Crowdfund memories that last.
+          </h1>
+          <p className="max-w-xl text-[17px] text-muted sm:text-lg">
+            List the honeymoon, the guitar, the espresso machine. Guests chip in any amount over UPI and leave a wish with it.
+          </p>
+        </div>
+        <div className="max-w-md">
+          <SampleCard />
+        </div>
+        <Link to="/demo" className="btn btn-sage !py-4 text-base sm:w-auto">
+          <Sparkles size={18} /> Try the live demo
+        </Link>
       </div>
-      <SampleCard />
-      <Link to="/demo" className="btn btn-sage w-full !py-4 text-base"><Sparkles size={18} /> Try the live demo</Link>
-      <section className="border-t border-line pt-6">
-        {hasSupabase ? <Account /> : (
-          <p className="rounded-2xl bg-terra-soft p-4 text-sm text-terra-dark">Sign-in is off because Supabase isn’t configured yet. Add your keys to <code>.env</code> (see README) or explore the demo.</p>
-        )}
+      <section className="border-t border-line pt-8 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
+        <div className="mx-auto w-full max-w-md lg:mx-0">
+          {hasSupabase ? <Account /> : (
+            <p className="rounded-2xl bg-terra-soft p-4 text-sm text-terra-dark">
+              Sign-in is off because Supabase isn’t configured yet. Add your keys to <code>.env</code> (see README) or explore the demo.
+            </p>
+          )}
+        </div>
       </section>
     </div>
   )
